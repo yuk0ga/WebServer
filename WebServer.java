@@ -16,18 +16,19 @@ public class WebServer {
             ServerSocket ss = new ServerSocket(port);
             System.out.println("Web Server Started at port: " + ss.getLocalPort());
             Socket s = ss.accept();
-            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream(), "UTF-8"));
-            String line = in.readLine();
-            String requestPath;
-            requestPath = rootPath + line.split(" ")[1];
-            if (requestPath.endsWith("/")){
-                requestPath += "index.html";
+            while (true) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream(), "UTF-8"));
+                String line = in.readLine();
+                String requestPath;
+                if (line != null){
+                    requestPath = rootPath + line.split(" ")[1];
+                    if (requestPath.endsWith("/")) {
+                        requestPath += "index.html";
+                    }
+                    System.out.println(requestPath);
+                    getFile(s, requestPath);
+                }
             }
-//            while ((line = in.readLine()) != null && !line.isEmpty()){
-//                System.out.println(line);
-//            }
-            System.out.println(requestPath);
-            getFile(s,requestPath);
         } catch (IOException e) {
             e.printStackTrace();
         }
