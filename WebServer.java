@@ -8,7 +8,7 @@ import java.net.Socket;
  */
 public class WebServer {
 
-    static String rootPath = "/Users/koga/Desktop";
+    static String rootPath = "/Users/koga/Desktop/Files";
     static Socket s;
     static ServerSocket ss;
 
