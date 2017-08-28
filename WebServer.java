@@ -41,16 +41,21 @@ public class WebServer {
             FileInputStream fis = new FileInputStream(file);
             int fileLength = (int) file.length();
             byte buff[] = new byte[fileLength];
+
+            //http header
             out.println("HTTP/1.1 200 OK");
             out.println("Content-Type: text/html");
             out.println("Content-Length: " + fileLength);
             out.println();
 
+            //response
             fis.read(buff);
             out.write(buff, 0, fileLength);
             out.flush();
                 System.out.println("Returned: " + ServerThread.requestPath);
+
             } else {
+                //when file was not found
                 out.println("HTTP/1.1 404 Not Found");
                 out.println("Content-Type: text/html");
                 out.println();
