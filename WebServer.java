@@ -37,14 +37,10 @@ public class WebServer {
         File file = new File(filePath);
 
         try {
+            if (file.exists()) {            //confirms if file exists
             FileInputStream fis = new FileInputStream(file);
-//            FileReader r = new FileReader(file);
-//            BufferedReader br = new BufferedReader(r);
             int fileLength = (int) file.length();
-            if (fileLength > 0) {
             byte buff[] = new byte[fileLength];
-//            String line;
-//            while ((line = br.readLine()) != null){
             out.println("HTTP/1.1 200 OK");
             out.println("Content-Type: text/html");
             out.println("Content-Length: " + fileLength);
@@ -53,24 +49,34 @@ public class WebServer {
             fis.read(buff);
             out.write(buff, 0, fileLength);
             out.flush();
+                System.out.println("Returned: " + ServerThread.requestPath);
             } else {
                 out.println("HTTP/1.1 404 Not Found");
+                out.println("Content-Type: text/html");
+                out.println();
+                try (InputStream fis
+                             = new BufferedInputStream(new FileInputStream(rootPath + "/404.html"))) {
+                    int ch;
+                    while ((ch = fis.read()) != -1) {
+                        out.write(ch);
+                    }
+                    System.out.println("Returned: 404 Not Found");
+                }
             }
-//            }
         }catch (FileNotFoundException e){
-            out.println("HTTP/1.1 404 Not Found");
+            e.printStackTrace();
         }
     }
 }
 
 class ServerThread implements Runnable {
+    static String requestPath;
     @Override
     public void run() {
         while (true) {
             try{
             BufferedReader in = new BufferedReader(new InputStreamReader(WebServer.s.getInputStream(), "UTF-8"));
             String line = in.readLine();
-            String requestPath;
             if (line != null) {
                 requestPath = WebServer.rootPath + line.split(" ")[1];
                 if (requestPath.endsWith("/")) {
