@@ -88,9 +88,12 @@ public class WebServer {
         byte authbuff[] = new byte[authFileLength];
 
         //header
+//        while (Authが一致){
+
         out.println("HTTP/1.1 401 Authorization Required");
         out.println("WWW-Authenticate: Basic realm=\"Secret File\"");
         out.println("Content-Type: text/html");
+        out.println("Content-Length: " + authFileLength);
         out.println();
 
         //body
@@ -98,6 +101,8 @@ public class WebServer {
         out.write(authbuff, 0, authFileLength);
         out.flush();
         System.out.println("Returned: 401 Authorization Required");
+
+//        }
     }
 }
 
@@ -109,7 +114,11 @@ class ServerThread implements Runnable {        //Thread
             try{
             BufferedReader in = new BufferedReader(new InputStreamReader(WebServer.s.getInputStream(), "UTF-8"));
             String line = in.readLine();
-            if (line != null) {
+            //print request
+//                while (!line.isEmpty()){              Trying to print all HTTP request header.
+//                    System.out.println(line);
+//                }
+//            if (line != null) {                                                   No need?
                 requestPath = WebServer.rootPath + line.split(" ")[1];
                 if (requestPath.endsWith("/")) {
                     requestPath += "index.html";
@@ -118,9 +127,12 @@ class ServerThread implements Runnable {        //Thread
                 if (requestPath.endsWith("test.html")) {
                     WebServer.basic();
                 }
+                //Authorization key
+//                System.out.println(line.split("\n")[1]);      Trying to get the Authorization key in the request header.
+
                 System.out.println("Request " + requestPath);
                 WebServer.getFile(WebServer.s, requestPath);
-            }
+//            }
                 } catch (IOException e) {
                     e.printStackTrace();
                     return;
