@@ -48,13 +48,13 @@ public class WebServer {
             int fileLength = (int) file.length();
             byte buff[] = new byte[fileLength];
 
-            //http header
+            //response header
             out.println("HTTP/1.1 200 OK");
             out.println("Content-Type: text/html");
             out.println("Content-Length: " + fileLength);
             out.println();
 
-            //response
+            //response body
             fis.read(buff);
             out.write(buff, 0, fileLength);
             out.flush();
@@ -78,6 +78,27 @@ public class WebServer {
             e.printStackTrace();
         }
     }
+
+    static void basic() throws IOException{
+        PrintStream out = new PrintStream(s.getOutputStream(), true);
+
+        File authfile = new File(rootPath + "/401.html");
+        FileInputStream authfis = new FileInputStream(authfile);
+        int authFileLength = (int) authfile.length();
+        byte authbuff[] = new byte[authFileLength];
+
+        //header
+        out.println("HTTP/1.1 401 Authorization Required");
+        out.println("WWW-Authenticate: Basic realm=\"Secret File\"");
+        out.println("Content-Type: text/html");
+        out.println();
+
+        //body
+        authfis.read(authbuff);
+        out.write(authbuff, 0, authFileLength);
+        out.flush();
+        System.out.println("Returned: 401 Authorization Required");
+    }
 }
 
 class ServerThread implements Runnable {        //Thread
@@ -92,6 +113,10 @@ class ServerThread implements Runnable {        //Thread
                 requestPath = WebServer.rootPath + line.split(" ")[1];
                 if (requestPath.endsWith("/")) {
                     requestPath += "index.html";
+                }
+                //basic authorization
+                if (requestPath.endsWith("test.html")) {
+                    WebServer.basic();
                 }
                 System.out.println("Request " + requestPath);
                 WebServer.getFile(WebServer.s, requestPath);
