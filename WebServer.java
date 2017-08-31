@@ -1,6 +1,8 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+//import java.util.Enumeration;
+//import javax.servlet.http.HttpServletRequest;
 
 /**
  * Created by koga on 2017/07/28.
@@ -104,31 +106,59 @@ public class WebServer {
 
 //        }
     }
+
+//    static void getHeader() {
+//        StringBuilder sb = new StringBuilder();
+//
+//            // 全リクエストヘッダ名を取得
+//        Enumeration<?> headerNames = request.getHeaderNames();
+//        while (headerNames.hasMoreElements()) {
+//
+//            // ヘッダ名と値を取得
+//            String headerName = (String)headerNames.nextElement();
+//            String headerValue = request.getHeader(headerName);
+//
+//            sb.append(headerName);
+//            sb.append("=");
+//            sb.append(headerValue);
+//            sb.append("\n");
+//        }
+//
+//        System.out.print(sb);
+//    }
 }
 
 class ServerThread implements Runnable {        //Thread
     static String requestPath;
+    static String key;
     @Override
     public void run() {
         while (true) {
             try{
             BufferedReader in = new BufferedReader(new InputStreamReader(WebServer.s.getInputStream(), "UTF-8"));
-            String line = in.readLine();
+            String file = in.readLine();
+            String line;
             //print request
-//                while (!line.isEmpty()){              Trying to print all HTTP request header.
-//                    System.out.println(line);
-//                }
+                while ((line = in.readLine()) != null){     //Trying to print all HTTP request header.
+                    System.out.println(line);
+                    if (line.contains("a29nYToxcWF6eHN3Mg==")){
+                        key = "a29nYToxcWF6eHN3Mg==";            //gets authorization key (koga:1-2)
+                    }
+                    if (line.contains("keep-alive")){
+                        break;
+                    }
+                }
 //            if (line != null) {                                                   No need?
-                requestPath = WebServer.rootPath + line.split(" ")[1];
+                requestPath = WebServer.rootPath + file.split(" ")[1];
                 if (requestPath.endsWith("/")) {
                     requestPath += "index.html";
                 }
                 //basic authorization
                 if (requestPath.endsWith("test.html")) {
-                    WebServer.basic();
+                    if (!key.equals("29nYToxcWF6eHN3Mg==")){     //as long as key is not correct, require basic
+                        WebServer.basic();
+                    }
                 }
-                //Authorization key
-//                System.out.println(line.split("\n")[1]);      Trying to get the Authorization key in the request header.
 
                 System.out.println("Request " + requestPath);
                 WebServer.getFile(WebServer.s, requestPath);
